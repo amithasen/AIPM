@@ -25,15 +25,15 @@ html_temp = """
 st.markdown(html_temp,unsafe_allow_html=True)
 
 ##st.header('AIPM Dashboard')
-st.write('Welcome to our dashboard, here you can see how '
-         ' we can make use of streamlit feature in our project dashboard.')
+st.write('Welcome to our dashboard! here you can see how '
+         ' we can make use of AI feature to accomplish management goals.')
 
 st.markdown("### Team members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
 
 #########################################################################################
 
 add_selectbox = st.sidebar.selectbox(
-    "Type of Project management template to use?",
+    "Type of Project Management template/tool to use?",
     ("Jira", "Rally", "Microsoft PM", "Others")
 )
 
@@ -43,7 +43,7 @@ add_selectbox = st.sidebar.selectbox(
 )
 
 add_selectbox = st.sidebar.selectbox(
-    "Which Supervised ML you want to use?",
+    "Which AI/ML you want to use?",
     ("Regression", "Classification", "Clustering", "Neural Networks")
 )
 
@@ -111,7 +111,7 @@ df = df.drop('Issue Type', axis=1)
 #st.line_chart(df[column])
 
 ## select multi-columns
-columns = st.multiselect(label='What column to you want to display', options=df.columns)
+columns = st.multiselect(label='What columns do you want to display in Line chart', options=df.columns)
 st.line_chart(df[columns])
 
 ## to display correlation heatmap
@@ -175,8 +175,8 @@ if is_check:
 #st.write(ypred)
 
 st.markdown("## Party time!")
-st.write("Yay! We're done our ML web app using Streamlit. Click below to celebrate.")
-btn = st.button("Celebrate!")
+st.write("Yay! We're done with our analysis and prediction. Click below to celebrate.")
+btn = st.button("Let's Celebrate!")
 if btn:
     st.balloons()
 
