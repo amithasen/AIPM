@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 #import pandas_profiling as pp
 
-st.set_option('deprecation.showfileUploaderEncoding', False)
+#st.set_option('deprecation.showfileUploaderEncoding', False)
 
 hide_streamlit_style = """
             <style>
@@ -53,10 +53,10 @@ add_selectbox = st.sidebar.selectbox(
 )
 ###########################################################################################
 
-uploaded_file = st.file_uploader("Choose your data file", type="csv")
-if uploaded_file is not None:
-	df = pd.read_csv(uploaded_file)
-	st.write(data)
+#uploaded_file = st.file_uploader("Choose your data file", type="csv")
+#if uploaded_file is not None:
+	#df = pd.read_csv(uploaded_file)
+	#st.write(data)
 
 df = pd.read_excel("JIRA_subset2_final.xlsx")
 
