@@ -116,10 +116,18 @@ st.line_chart(df[columns])
 
 ## to display correlation heatmap
 
+# get correation of each feature in dataset
+corrmat=df.corr()
+top_corr_features=corrmat.index
+plt.figure(figsize=(16,16))
+# plot the heatmap
+hmap=sns.heatmap(df[top_corr_features].corr(),annot=True,cmap="RdYlGn")
+
 is_check = st.checkbox("Display Correlation Heatmap")
 if is_check:
-    st.write(sns.heatmap(df.corr()))
+    st.write(hmap)
     st.pyplot()
+	
 #############################################################################################
 
 ## Oversampling using SMOTE
