@@ -18,24 +18,250 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 #st.title('Testing Streamlit for our ML model')
 html_temp = """
-	<div style="background-color:tomato;padding:5px">
+	<div style="background-color:tomato;padding:3px">
 	<h2 style="color:white;text-align:center;"> AIPM Dashboard </h2>
 	</div>
 	"""
 st.markdown(html_temp,unsafe_allow_html=True)
 
 ##st.header('AIPM Dashboard')
-st.write('Welcome to our dashboard! here you can see how '
+st.write(' Welcome to our dashboard! here you can see how '
          ' we can make use of AI feature to accomplish management goals.')
 
 st.markdown("### Team members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
 
 #########################################################################################
 
-add_selectbox = st.sidebar.selectbox(
-    "Type of Project Management template/tool to use?",
+#uploaded_file = st.file_uploader("Choose your data file", type="csv")
+#if uploaded_file is not None:
+	#df = pd.read_csv(uploaded_file)
+	#st.write(data)
+page = st.sidebar.selectbox(
+    "Type of Project management template/tool to use?",
     ("Jira", "Rally", "Microsoft PM", "Others")
 )
+
+#page = st.sidebar.selectbox("Choose a page", ['Homepage', 'Exploration', 'Prediction'])
+if page == 'Jira':
+    df = pd.read_excel("JIRA_subset2_final.xlsx")
+
+    ## to display raw data
+    is_check = st.checkbox("Display Raw Data")
+    if is_check:
+        st.write(df)
+
+    ## to display classification in train dataset
+    is_check = st.checkbox("Classification in training set")
+    if is_check:
+    	chart_data = pd.value_counts(df["Resolution"])
+    	st.bar_chart(chart_data)
+
+
+    #is_check = st.checkbox("EDA on raw data")
+    #if is_check:
+        #st.write(pp.ProfileReport(df))
+
+
+    ## converting date fields to numeric ordinal values
+    ######################################################################################
+
+    import datetime as dt
+
+    df['Created'] = pd.to_datetime(df['Created'])
+    df['Created'] = df['Created'].map(dt.datetime.toordinal)
+
+    df['Updated'] = pd.to_datetime(df['Updated'])
+    df['Updated'] = df['Updated'].map(dt.datetime.toordinal)
+
+    df['Due Date'] = pd.to_datetime(df['Due Date'])
+    df['Due Date'] = df['Due Date'].map(dt.datetime.toordinal)
+
+    df['Target Date'] = pd.to_datetime(df['Target Date'])
+    df['Target Date'] = df['Target Date'].map(dt.datetime.toordinal)
+
+    ## converting all categorical variable to numerical columns
+
+    for feature in df.columns: # Loop through all columns in the dataframe
+        if df[feature].dtype == 'object': # Only apply for columns with categorical strings
+            df[feature] = pd.Categorical(df[feature]).codes # Replace strings with an integer
+
+    ## dropping unwanted columns
+    df = df.drop('Due Date', axis=1)
+    df = df.drop('Resolution', axis=1)
+    df = df.drop('Issue Type', axis=1)
+    ############################################################################################
+
+    ## selected column to display
+    #column = st.selectbox('What column to you want to display', df.columns)
+    #st.line_chart(df[column])
+
+    ## select multi-columns
+    columns = st.multiselect(label='What columns do you want to display in line chart', options=df.columns)
+    st.line_chart(df[columns])  
+
+    ## to display correlation heatmap
+
+    # get correation of each feature in dataset
+    corrmat=df.corr()
+    top_corr_features=corrmat.index
+    plt.figure(figsize=(16,16))
+    # plot the heatmap
+    hmap=sns.heatmap(df[top_corr_features].corr(),annot=True,cmap="RdYlGn")
+
+    is_check = st.checkbox("Display Correlation Heatmap")
+    if is_check:
+        st.write(hmap)
+        st.pyplot()
+        
+    #############################################################################################
+
+    ## Oversampling using SMOTE
+    from imblearn.over_sampling import SMOTE
+    from sklearn.model_selection import train_test_split
+
+    X = df.drop("Classification", axis=1)
+    y = df["Classification"] 
+    X_res, y_res = SMOTE().fit_sample(X, y)
+    test_size = 0.30 # taking 70:30 training and test set
+    seed = 7  # Random numbmer seeding for reapeatability of the code
+    X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=test_size, random_state=seed)
+
+
+    ## Building the model
+    # Ensemble method - RandomForest Classifier..
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn import metrics
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import confusion_matrix,classification_report
+
+    rfcl = RandomForestClassifier(n_estimators = 30)
+    rfcl = rfcl.fit(X_train, y_train)
+
+    Y_predict = rfcl.predict(X_test)
+    ##############################################################################################
+
+    ## to display accuracy of our model
+
+    is_check = st.checkbox("Our Model Accuracy Summary")
+    if is_check:
+        st.write('Model Accuracy Score:',rfcl.score(X_test , y_test))
+        st.write('Model Precision Score:',metrics.precision_score(y_test,Y_predict))
+        st.write('Model Recall Score:',metrics.recall_score(y_test,Y_predict))
+        st.write('Model Confusion Matrix:')
+        st.write(metrics.confusion_matrix(y_test, Y_predict))
+
+elif page == 'Rally':
+    df = pd.read_excel("Rally_Sprint.xlsx")
+
+    ## to display raw data
+    is_check = st.checkbox("Display Raw Data")
+    if is_check:
+        st.write(df)
+
+    df["Milestones"]= df["Milestones_Month"] + df["Milestone_Week"]
+
+    ## to display classification in train dataset
+    is_check = st.checkbox("Classification in the training set")
+    if is_check:
+        chart_data = pd.value_counts(df["Milestones"])
+        st.bar_chart(chart_data)
+
+        ## Dropping unwanted or irrelavant columns..
+
+    df = df.drop('State', axis=1)
+    df = df.drop('Acceptance Criteria', axis=1)
+    df = df.drop('Biz Priority', axis=1)
+    df = df.drop('Business Application Name', axis=1)
+    df = df.drop('Closed Date', axis=1)
+    df = df.drop('Defect Status', axis=1)
+    df = df.drop('Defect Type', axis=1)
+    df = df.drop('Defects', axis=1)
+    df = df.drop('Defect Suites', axis=1)
+    df = df.drop('Duplicates', axis=1)
+    df = df.drop('ERMO Release Name', axis=1)
+    df = df.drop('Feature', axis=1)
+    df = df.drop('HasParent', axis=1)
+    df = df.drop('Parent', axis=1)
+    df = df.drop('Portfolio Item', axis=1)
+    df = df.drop('Priority', axis=1)
+    df = df.drop('Opened Date', axis=1)
+    df = df.drop('Resolution', axis=1)
+    df = df.drop('RootCause', axis=1)
+    df = df.drop('Tags', axis=1)
+    df = df.drop('Test Case', axis=1)
+    df = df.drop('Target Date', axis=1)
+    df = df.drop('Target Build', axis=1)
+    df = df.drop('Milestones_Month', axis=1)
+    df = df.drop('Milestone_Week', axis=1)
+    df = df.drop('Blocked', axis=1)
+    df = df.drop('Project', axis=1)
+    df = df.drop('Ready', axis=1)
+
+    ## converting all categorical variable to numerical columns
+
+    for feature in df.columns: # Loop through all columns in the dataframe
+        if df[feature].dtype == 'float64': # Only apply for columns with categorical strings
+           df[feature] = df[feature].astype(str) # Replace strings with an integer
+
+    ## converting all categorical variable to numerical columns
+
+    for feature in df.columns: # Loop through all columns in the dataframe
+        if df[feature].dtype == 'object': # Only apply for columns with categorical strings
+            df[feature] = pd.Categorical(df[feature]).codes # Replace strings with an integer
+
+    ## converting all categorical variable to numerical columns
+
+    for feature in df.columns: # Loop through all columns in the dataframe
+        if df[feature].dtype == 'bool': # Only apply for columns with categorical strings
+            df[feature] = pd.Categorical(df[feature]).codes # Replace strings with an integer
+
+    ## select multi-columns
+    columns = st.multiselect(label='What columns do you want to display in line chart', options=df.columns)
+    st.line_chart(df[columns])
+
+    # get correation of each feature in dataset
+    corrmat=df.corr()
+    top_corr_features=corrmat.index
+    plt.figure(figsize=(16,16))
+    # plot the heatmap
+    hmap=sns.heatmap(df[top_corr_features].corr(),annot=True,cmap="RdYlGn")
+
+    is_check = st.checkbox("Display Correlation Heatmap")
+    if is_check:
+        st.write(hmap)
+        st.pyplot()
+
+    from scipy.stats import zscore
+    df_z = df.apply(zscore)
+
+    X = df_z.drop("Milestones" , axis=1)
+    y= df_z["Milestones"]
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.30, random_state=1)
+
+    from sklearn.ensemble import  GradientBoostingRegressor
+    from sklearn import metrics
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import confusion_matrix,classification_report
+
+    gbmTree = GradientBoostingRegressor(n_estimators=30)
+    gbmTree = gbmTree.fit(X_train,y_train)
+
+    Y_predict = gbmTree.predict(X_test)
+
+
+    ## to display accuracy of our model
+
+    is_check = st.checkbox("Our Model Accuracy Summary")
+    if is_check:
+        st.write('Model Accuracy Score in train data:',gbmTree.score(X_train, y_train))
+        st.write('Model Accuracy Score in test:',gbmTree.score(X_test, y_test))
+
+else:
+    st.markdown("# Page Under Construction!")
+
+########################################################################################
 
 add_selectbox = st.sidebar.selectbox(
     "Type of Machine learning you want to use?",
@@ -43,7 +269,7 @@ add_selectbox = st.sidebar.selectbox(
 )
 
 add_selectbox = st.sidebar.selectbox(
-    "Which AI/ML you want to use?",
+    "Which AI/ML model you want to use?",
     ("Regression", "Classification", "Clustering", "Neural Networks")
 )
 
@@ -52,118 +278,6 @@ add_selectbox = st.sidebar.selectbox(
     ("Linear Regression","Logistic Regression","Naive Bayes","SVM","KNN","Decision Tree","RandomForest","ANN","CNN","RNN")
 )
 ###########################################################################################
-
-#uploaded_file = st.file_uploader("Choose your data file", type="csv")
-#if uploaded_file is not None:
-	#df = pd.read_csv(uploaded_file)
-	#st.write(data)
-
-df = pd.read_excel("JIRA_subset2_final.xlsx")
-
-## to display raw data
-is_check = st.checkbox("Display Raw Data")
-if is_check:
-    st.write(df)
-
-## to display classification in train dataset
-is_check = st.checkbox("Classification in training set")
-if is_check:
-	chart_data = pd.value_counts(df["Resolution"])
-	st.bar_chart(chart_data)
-
-
-#is_check = st.checkbox("EDA on raw data")
-#if is_check:
-    #st.write(pp.ProfileReport(df))
-
-
-## converting date fields to numeric ordinal values
-######################################################################################
-
-import datetime as dt
-
-df['Created'] = pd.to_datetime(df['Created'])
-df['Created'] = df['Created'].map(dt.datetime.toordinal)
-
-df['Updated'] = pd.to_datetime(df['Updated'])
-df['Updated'] = df['Updated'].map(dt.datetime.toordinal)
-
-df['Due Date'] = pd.to_datetime(df['Due Date'])
-df['Due Date'] = df['Due Date'].map(dt.datetime.toordinal)
-
-df['Target Date'] = pd.to_datetime(df['Target Date'])
-df['Target Date'] = df['Target Date'].map(dt.datetime.toordinal)
-
-## converting all categorical variable to numerical columns
-
-for feature in df.columns: # Loop through all columns in the dataframe
-    if df[feature].dtype == 'object': # Only apply for columns with categorical strings
-        df[feature] = pd.Categorical(df[feature]).codes # Replace strings with an integer
-
-## dropping unwanted columns
-df = df.drop('Due Date', axis=1)
-df = df.drop('Resolution', axis=1)
-df = df.drop('Issue Type', axis=1)
-############################################################################################
-
-## selected column to display
-#column = st.selectbox('What column to you want to display', df.columns)
-#st.line_chart(df[column])
-
-## select multi-columns
-columns = st.multiselect(label='What columns do you want to display in Line chart', options=df.columns)
-st.line_chart(df[columns])
-
-## to display correlation heatmap
-
-# get correation of each feature in dataset
-corrmat=df.corr()
-top_corr_features=corrmat.index
-plt.figure(figsize=(16,16))
-# plot the heatmap
-hmap=sns.heatmap(df[top_corr_features].corr(),annot=True,cmap="RdYlGn")
-
-is_check = st.checkbox("Display Correlation Heatmap")
-if is_check:
-    st.write(hmap)
-    st.pyplot()
-	
-#############################################################################################
-
-## Oversampling using SMOTE
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
-
-X = df.drop("Classification", axis=1)
-y = df["Classification"] 
-X_res, y_res = SMOTE().fit_sample(X, y)
-test_size = 0.30 # taking 70:30 training and test set
-seed = 7  # Random numbmer seeding for reapeatability of the code
-X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=test_size, random_state=seed)
-
-
-## Building the model
-# Ensemble method - RandomForest Classifier..
-from sklearn.ensemble import RandomForestClassifier
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import confusion_matrix,classification_report
-
-rfcl = RandomForestClassifier(n_estimators = 30)
-rfcl = rfcl.fit(X_train, y_train)
-
-Y_predict = rfcl.predict(X_test)
-##############################################################################################
-
-## to display accuracy of our model
-
-is_check = st.checkbox("Our Model Accuracy Summary")
-if is_check:
-    st.write('Model Accuracy Score:',rfcl.score(X_test , y_test))
-    st.write('Model Precision Score:',metrics.precision_score(y_test,Y_predict))
-    st.write('Model Recall Score:',metrics.recall_score(y_test,Y_predict))
-    st.write('Model Confusion Matrix:')
-    st.write(metrics.confusion_matrix(y_test, Y_predict))
 
 #@st.cache
 #def fetch_and_clean_data():
