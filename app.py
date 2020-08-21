@@ -25,10 +25,10 @@ html_temp = """
 st.markdown(html_temp,unsafe_allow_html=True)
 
 ##st.header('AIPM Dashboard')
-st.write(' Welcome to our dashboard! here you can see how '
-         ' we can make use of AI feature to accomplish management goals.')
+st.write(' Welcome to our AIPM Dashboard! here you can see how '
+         ' we can make use of AI & ML feature to accomplish Management goals/vision.')
 
-st.markdown("### Team members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
+st.markdown("### Risers Team members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
 
 #########################################################################################
 
@@ -165,8 +165,20 @@ elif page == 'Rally':
     if is_check:
         chart_data = pd.value_counts(df["Milestones"])
         st.bar_chart(chart_data)
+    
+    ## To trasform target column to UTC format
+    cleanup_milestones = { "Milestones" : {"Feb Week 2" : "08/02/2020", "Mar Week 2" : "14/03/2020", "Apr Week 1" : "04/04/2020", "May Week 2" : "09/05/2020", "May Week 4" : "23/05/2020", "Jun Week 1" : "06/06/2020", "Jun Week 2" : "13/06/2020", "Sep Week 1" : "05/09/2020"}}
+    df.replace(cleanup_milestones, inplace=True)
 
-        ## Dropping unwanted or irrelavant columns..
+
+    df["Milestones"]= pd.to_datetime(df["Milestones"]) 
+
+    df["Milestones"] = pd.to_datetime(df['Milestones'].values).astype(int)/ 10**9
+
+    df['Milestones'] = df['Milestones'].astype(int)
+
+
+    ## Dropping unwanted or irrelavant columns..
 
     df = df.drop('State', axis=1)
     df = df.drop('Acceptance Criteria', axis=1)
@@ -231,32 +243,38 @@ elif page == 'Rally':
         st.write(hmap)
         st.pyplot()
 
-    from scipy.stats import zscore
-    df_z = df.apply(zscore)
+    #from scipy.stats import zscore
+    #df_z = df.apply(zscore)
 
-    X = df_z.drop("Milestones" , axis=1)
-    y= df_z["Milestones"]
+    X = df.drop("Milestones" , axis=1)
+    y= df["Milestones"]
 
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.30, random_state=1)
 
     from sklearn.ensemble import  GradientBoostingRegressor
+    from sklearn.ensemble import  RandomForestRegressor
+
     from sklearn import metrics
     from sklearn.metrics import accuracy_score
     from sklearn.metrics import confusion_matrix,classification_report
 
-    gbmTree = GradientBoostingRegressor(n_estimators=30)
-    gbmTree = gbmTree.fit(X_train,y_train)
+    rfTree = RandomForestRegressor(n_estimators=100)
+    rfTree = rfTree.fit(X_train,y_train)
 
-    Y_predict = gbmTree.predict(X_test)
+    Y_predict = rfTree.predict(X_test)
 
 
     ## to display accuracy of our model
 
     is_check = st.checkbox("Our Model Accuracy Summary")
     if is_check:
-        st.write('Model Accuracy Score in train data:',gbmTree.score(X_train, y_train))
-        st.write('Model Accuracy Score in test:',gbmTree.score(X_test, y_test))
+        st.write('Model Accuracy Score in train data:', rfTree.score(X_train, y_train))
+        st.write('Model Accuracy Score in test:', rfTree.score(X_test, y_test))
+
+    is_check = st.checkbox("Regression model output")
+    if is_check:
+        st.write('Regression Model output in test data:', pd.to_datetime(Y_predict, unit='s'))
 
 else:
     st.markdown("# Page Under Construction!")
@@ -301,8 +319,3 @@ st.write("Yay! We're done with our analysis and prediction. Click below to celeb
 btn = st.button("Let's Celebrate!")
 if btn:
     st.balloons()
-
-
-
-
-
