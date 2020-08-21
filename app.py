@@ -295,6 +295,11 @@ add_selectbox = st.sidebar.selectbox(
     "Which Algorithm you want to use?",
     ("Linear Regression","Logistic Regression","Naive Bayes","SVM","KNN","Decision Tree","RandomForest","ANN","CNN","RNN")
 )
+
+add_selectbox = st.sidebar.selectbox(
+    "Functional Graphs & Visualization",
+    ("Graph 1", "Graph 2", "Graph 3")
+)
 ###########################################################################################
 
 #@st.cache
