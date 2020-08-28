@@ -33,9 +33,12 @@ st.write(' Welcome to our AIPM Dashboard! here you can see how '
 
 #########################################################################################
 
+st.markdown("### Functional Graphs & Visualization")
+
+
 page = st.sidebar.selectbox(
     "Functional Graphs & Visualization",
-    (" ", "Effort Summary", "Trends Summary", "Resource Utilization")
+    ("Effort Summary", "Trends Summary", "Resource Utilization")
 )
 
 if page == "Effort Summary":
@@ -104,6 +107,9 @@ page = st.sidebar.selectbox(
 
 #page = st.sidebar.selectbox("Choose a page", ['Homepage', 'Exploration', 'Prediction'])
 if page == 'Jira':
+
+    st.markdown("### Exploratory Data Analysis")
+
     df = pd.read_excel("JIRA_subset2_final.xlsx")
 
     ## to display raw data
@@ -203,6 +209,8 @@ if page == 'Jira':
 
     ## to display accuracy of our model
 
+    st.markdown("### Model Summary")
+
     is_check = st.checkbox("Our Model Accuracy Summary")
     if is_check:
         st.write('Model Accuracy Score:',rfcl.score(X_test , y_test))
@@ -212,6 +220,9 @@ if page == 'Jira':
         st.write(metrics.confusion_matrix(y_test, Y_predict))
 
 elif page == 'Rally':
+
+    st.markdown("### Exploratory Data Analysis")
+
     df = pd.read_excel("Rally_Sprint.xlsx")
 
     ## to display raw data
@@ -327,6 +338,8 @@ elif page == 'Rally':
 
 
     ## to display accuracy of our model
+
+    st.markdown("### Model Summary & Prediction")
 
     is_check = st.checkbox("Our Model Accuracy Summary")
     if is_check:
