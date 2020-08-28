@@ -24,20 +24,81 @@ html_temp = """
 	"""
 st.markdown(html_temp,unsafe_allow_html=True)
 
+st.markdown("### Risers Team Members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
+
 ##st.header('AIPM Dashboard')
 st.write(' Welcome to our AIPM Dashboard! here you can see how '
          ' we can make use of AI & ML feature to accomplish Management goals/vision.')
 
-st.markdown("### Risers Team members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
 
 #########################################################################################
+
+page = st.sidebar.selectbox(
+    "Functional Graphs & Visualization",
+    (" ", "Effort Summary", "Trends Summary", "Resource Utilization")
+)
+
+if page == "Effort Summary":
+
+    st.markdown("### Effort Summary")
+
+    df = pd.read_excel("Rally_Sprint.xlsx")
+
+    df["Effort"] = df["Formatted ID"].str.slice(0,2)
+
+    Effort = { "Effort" : {"US": "Scope", "DE": "Defects"}}
+    df.replace(Effort, inplace=True)
+
+    plt.figure(figsize=(6,6))
+
+    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%')
+    st.write(Graph1)
+    st.pyplot()
+
+    #import matplotlib.pyplot as plt
+    #%matplotlib inline
+    #pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.1f%%')
+        
+elif page == "Trends Summary":
+
+    st.markdown("### Sprint Trends Summary")
+
+    df = pd.read_excel("Rally_Sprint.xlsx")
+
+    df_trends = df[["Accepted Date","Creation Date","Iteration","Schedule State"]]
+
+    options = ["Released",'Accepted']
+    df_trends = df_trends[df_trends["Schedule State"].isin(options)]
+
+    import datetime as dt
+
+    df_trends['Accepted Date'] = pd.to_datetime(df_trends['Accepted Date']).dt.date
+    df_trends['Creation Date'] = pd.to_datetime(df_trends['Creation Date']).dt.date
+
+    df_trends["Days"] = df_trends["Accepted Date"] - df_trends["Creation Date"]
+
+    df_trends["Days"]= df_trends["Days"].dt.days.astype('int16')
+
+    result = df_trends.groupby('Iteration').agg({'Days': ['min', 'max', 'mean', 'std']}) 
+
+    from pandas.plotting import table
+    ax= result.plot(kind='bar', title='Sprint Trends', figsize=[12,6], alpha=.8, legend=True)
+
+    Graph2 = table(ax, np.round(result,0), loc='upper left')
+    st.write(Graph2)
+    st.pyplot()
+
+else:
+    st.markdown("## This Graph is Under Construction!!!")
+
+##############################################################################################################
 
 #uploaded_file = st.file_uploader("Choose your data file", type="csv")
 #if uploaded_file is not None:
 	#df = pd.read_csv(uploaded_file)
 	#st.write(data)
 page = st.sidebar.selectbox(
-    "Type of Project management template/tool to use?",
+    "Type of Project Management Template/tool to use?",
     ("Jira", "Rally", "Microsoft PM", "Others")
 )
 
@@ -296,10 +357,12 @@ add_selectbox = st.sidebar.selectbox(
     ("Linear Regression","Logistic Regression","Naive Bayes","SVM","KNN","Decision Tree","RandomForest","ANN","CNN","RNN")
 )
 
-add_selectbox = st.sidebar.selectbox(
-    "Functional Graphs & Visualization",
-    ("Graph 1", "Graph 2", "Graph 3")
-)
+# add_selectbox = st.sidebar.selectbox(
+#     "Functional Graphs & Visualization",
+#     (" ", "Graph 1", "Graph 2", "Graph 3")
+# )
+
+    
 ###########################################################################################
 
 #@st.cache
@@ -319,8 +382,10 @@ add_selectbox = st.sidebar.selectbox(
 #ypred = model.predict(df)
 #st.write(ypred)
 
-st.markdown("## Party time!")
-st.write("Yay! We're done with our analysis and prediction. Click below to celebrate.")
-btn = st.button("Let's Celebrate!")
-if btn:
-    st.balloons()
+###########################################################################################
+
+#st.markdown("## Party time!")
+#st.write("Yay! We're done with our analysis and prediction. Click below to celebrate.")
+#btn = st.button("Let's Celebrate!")
+#if btn:
+#    st.balloons()
