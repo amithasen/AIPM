@@ -38,7 +38,7 @@ st.markdown("### Functional Graphs & Visualization")
 
 page = st.sidebar.selectbox(
     "Functional Graphs & Visualization",
-    ("Effort Summary", "Trends Summary", "Resource Utilization")
+    ("Effort Distribution Summary", "Sprint Execution Summary", "Resource Utilization Summary")
 )
 
 if page == "Effort Distribution Summary":
@@ -54,7 +54,7 @@ if page == "Effort Distribution Summary":
 
     plt.figure(figsize=(6,6))
 
-    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%', title = 'Effor Distribution Trend', legend =True)
+    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%', title = 'Effor Distribution Summary', legend =True)
     st.write(Graph1)
     st.pyplot()
 
@@ -85,7 +85,7 @@ elif page == "Sprint Execution Summary":
     result = df_trends.groupby('Iteration').agg({'Days': ['min', 'max', 'mean', 'std']}) 
 
     from pandas.plotting import table
-    ax= result.plot(kind='barh', title='Sprint Execution Trends', figsize=[12,6], alpha=.8, legend=True, stacked=True)
+    ax= result.plot(kind='barh', title='Sprint Execution Summary', figsize=[12,6], legend=True, stacked=True)
 
     Graph2 = table(ax, np.round(result,0))
     st.write(Graph2)
