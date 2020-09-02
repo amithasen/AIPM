@@ -54,7 +54,7 @@ if page == "Effort Distribution Summary":
 
     plt.figure(figsize=(6,6))
 
-    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%', title = 'Effor Distribution Summary', legend =True)
+    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%', title = 'Effort Distribution Summary', legend =True)
     st.write(Graph1)
     st.pyplot()
 
