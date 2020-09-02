@@ -41,9 +41,9 @@ page = st.sidebar.selectbox(
     ("Effort Summary", "Trends Summary", "Resource Utilization")
 )
 
-if page == "Effort Summary":
+if page == "Effort Distribution Summary":
 
-    st.markdown("### Effort Summary")
+    st.markdown("### Effort Distribution Summary")
 
     df = pd.read_excel("Rally_Sprint.xlsx")
 
@@ -54,7 +54,7 @@ if page == "Effort Summary":
 
     plt.figure(figsize=(6,6))
 
-    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%')
+    Graph1 = pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.0f%%', title = 'Effor Distribution Trend', legend =True)
     st.write(Graph1)
     st.pyplot()
 
@@ -62,9 +62,9 @@ if page == "Effort Summary":
     #%matplotlib inline
     #pd.value_counts(df["Effort"]).plot(kind="pie", autopct='%1.1f%%')
         
-elif page == "Trends Summary":
+elif page == "Sprint Execution Summary":
 
-    st.markdown("### Sprint Trends Summary")
+    st.markdown("### Sprint Execution Summary")
 
     df = pd.read_excel("Rally_Sprint.xlsx")
 
@@ -85,9 +85,9 @@ elif page == "Trends Summary":
     result = df_trends.groupby('Iteration').agg({'Days': ['min', 'max', 'mean', 'std']}) 
 
     from pandas.plotting import table
-    ax= result.plot(kind='bar', title='Sprint Trends', figsize=[12,6], alpha=.8, legend=True)
+    ax= result.plot(kind='barh', title='Sprint Execution Trends', figsize=[12,6], alpha=.8, legend=True, stacked=True)
 
-    Graph2 = table(ax, np.round(result,0), loc='upper left')
+    Graph2 = table(ax, np.round(result,0))
     st.write(Graph2)
     st.pyplot()
 
