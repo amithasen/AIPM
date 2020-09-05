@@ -82,10 +82,17 @@ elif page == "Sprint Execution Summary":
 
     df_trends["Days"]= df_trends["Days"].dt.days.astype('int16')
 
-    result = df_trends.groupby('Iteration').agg({'Days': ['min', 'max', 'mean', 'std']}) 
+    a = df_trends.groupby(['Iteration'],sort=False).agg({'Days': ['min', 'max']})
+    b = df_trends.groupby(['Iteration'],sort=False).agg({'Days': ['mean', 'std']})
+
+    result = df_trends.groupby(['Iteration'],sort=False).agg({'Days': ['min', 'max', 'mean', 'std']})
 
     from pandas.plotting import table
-    ax= result.plot(kind='barh', title='Sprint Execution Summary', figsize=[12,6], legend=True, stacked=True)
+    #ax= result.plot(kind='barh', title='Sprint Execution Summary', figsize=[12,6], legend=True, stacked=True)
+    ax= a.plot(kind='bar', title='Sprint Execution Trends', figsize=[12,6],legend=True, stacked=True, colormap='winter')
+    b.plot(ax=ax, kind='line', figsize=[12,6], legend=True)
+
+    ax.set_ylabel('Days', fontsize=9)
 
     Graph2 = table(ax, np.round(result,0))
     st.write(Graph2)
