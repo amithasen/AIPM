@@ -8,4 +8,4 @@ imblearn==0.0
 xlrd==1.2.0
 xlsxwriter==1.2.7
 SpeechRecognition
-os.path
+os
