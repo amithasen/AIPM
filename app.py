@@ -53,9 +53,9 @@ if is_check:
         a=r.recognize_google(audio, language='en-IN')
 
 
-#        path= os.path.join(os.environ['USERPROFILE'], "Desktop")
+        #path= os.path.join(os.environ['USERPROFILE'], 'Desktop')
 
-        path= os.path.expanduser(os.sep.join(["~","Desktop"]))
+        path= os.path.expanduser(os.sep.join(['~','Desktop']))
 
         filename= "Speech_Recognized_File"
 
