@@ -36,6 +36,7 @@ st.markdown("### Speech Recognition")
 
 import speech_recognition as sr
 import requests
+import os.path
 #import urllib2
 
 is_check = st.checkbox("Generate Audio to Text file")
@@ -51,7 +52,13 @@ if is_check:
 
         a=r.recognize_google(audio, language='en-IN')
 
-        file = open("Speech_Recognized.txt","w") 
+
+        path= os.path.join(os.environ['USERPROFILE'], "Desktop")
+        filename= "Speech_Recognized_File"
+
+        full_path= os.path.join(path,filename+".txt")
+
+        file = open(full_path,"w") 
         file.write(a) 
         file.close() 
 
