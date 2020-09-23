@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 #import pandas_profiling as pp
 
-#st.set_option('deprecation.showfileUploaderEncoding', False)
+st.set_option('deprecation.showfileUploaderEncoding', False)
 
 hide_streamlit_style = """
             <style>
@@ -32,6 +32,35 @@ st.write(' Welcome to our AIPM Dashboard! here you can see how '
 
 
 #########################################################################################
+st.markdown("### Speech Recognition")
+
+import speech_recognition as sr
+import requests
+#import urllib2
+
+is_check = st.checkbox("Generate Audio to Text file")
+if is_check:
+    r=sr.Recognizer()
+    path = st.file_uploader("Select a audio file", type=['wav', 'mp3'])
+    if path is not None:
+
+        demo=sr.AudioFile(path)
+
+        with demo as source:
+                audio=r.record(source)
+
+        a=r.recognize_google(audio, language='en-IN')
+
+        file = open("Speech_Recognized.txt","w") 
+        file.write(a) 
+        file.close() 
+
+        st.markdown('Your Speech Recognition file is generated successfully!')
+#else:
+#    st.markdown("## No Audio File Selected!!!")
+
+
+#########################################################################################
 
 st.markdown("### Functional Graphs & Visualization")
 
@@ -43,7 +72,7 @@ page = st.sidebar.selectbox(
 
 if page == "Effort Distribution Summary":
 
-    st.markdown("### Effort Distribution Summary")
+    #st.markdown("### Effort Distribution Summary")
 
     df = pd.read_excel("Rally_Sprint.xlsx")
 
@@ -90,7 +119,7 @@ elif page == "Sprint Execution Summary":
     from pandas.plotting import table
     #ax= result.plot(kind='barh', title='Sprint Execution Summary', figsize=[12,6], legend=True, stacked=True)
     ax= a.plot(kind='bar', title='Sprint Execution Trends', figsize=[12,6],legend=True, stacked=True, colormap='winter')
-    b.plot(ax=ax, kind='line', figsize=[12,6], legend=True)
+    b.plot(ax=ax, kind='line', legend=True)
 
     ax.set_ylabel('Days', fontsize=9)
 
@@ -385,6 +414,10 @@ add_selectbox = st.sidebar.selectbox(
     
 ###########################################################################################
 
+#link = '[GitHub](http://github.com)'
+#st.markdown(link, unsafe_allow_html=True)
+#This will open the link when clicked on it.
+
 #@st.cache
 #def fetch_and_clean_data():
     #df = pd.read_csv('<some csv>')
@@ -401,6 +434,13 @@ add_selectbox = st.sidebar.selectbox(
 #model = pickle.load(open('model.pk', 'rb'))
 #ypred = model.predict(df)
 #st.write(ypred)
+
+
+#with st.file_input() as input:
+#  if input == None:
+#   st.warning('No file selected.')
+#  else:
+#    file_contents = input.read()
 
 ###########################################################################################
 
