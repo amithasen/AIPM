@@ -37,6 +37,8 @@ st.markdown("### Speech Recognition")
 import speech_recognition as sr
 import requests
 import os.path
+import base64
+
 #import urllib2
 
 is_check = st.checkbox("Generate Audio to Text file")
@@ -52,20 +54,36 @@ if is_check:
 
         a=r.recognize_google(audio, language='en-IN')
 
+        def download_link(object_to_download, download_filename, download_link_text):
+            if isinstance(object_to_download,pd.DataFrame):
+                object_to_download = object_to_download.to_csv(index=False)
 
-        path= os.path.join(os.environ['USERPROFILE'], 'Desktop')
+            # some strings <-> bytes conversions necessary here
+            b64 = base64.b64encode(object_to_download.encode()).decode()
+
+            return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
+
+
+        #st.write(a)
+
+        if st.button('Generate text file'):
+            tmp_download_link = download_link(a, 'Speech_Recognized_File.txt', 'Click here to download your text file!')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+
+        #path= os.path.join(os.environ['USERPROFILE'], 'Desktop')
 
         #path= os.path.expanduser(os.sep.join(['~','Desktop']))
 
-        filename= "Speech_Recognized_File"
+        #filename= "Speech_Recognized_File"
 
-        full_path= os.path.join(path,filename+".txt")
+        #full_path= os.path.join(path,filename+".txt")
 
-        file = open(full_path,"w") 
-        file.write(a) 
-        file.close() 
+        #file = open(full_path,"w") 
+        #file.write(a) 
+        #file.close() 
 
-        st.markdown('Your Speech Recognition file is generated successfully!')
+            st.markdown('Your Speech Recognition file is generated successfully!')
 #else:
 #    st.markdown("## No Audio File Selected!!!")
 
