@@ -225,10 +225,10 @@ if page == 'Jira':
     ## selected column to display
     #column = st.selectbox('What column to you want to display', df.columns)
     #st.line_chart(df[column])
-
+    st.markdown("### Interactive Chart")
     ## select multi-columns
-    columns = st.multiselect(label='What columns do you want to display in line chart', options=df.columns)
-    st.line_chart(df[columns])  
+    columns = st.multiselect(label='Choose the columns you want to display from below drop down!', options=df.columns)
+    st.area_chart(df[columns])  
 
     ## to display correlation heatmap
 
@@ -362,9 +362,10 @@ elif page == 'Rally':
     for feature in df.columns: # Loop through all columns in the dataframe
         if df[feature].dtype == 'bool': # Only apply for columns with categorical strings
             df[feature] = pd.Categorical(df[feature]).codes # Replace strings with an integer
-
+        
+    st.markdown("### Interactive Chart")
     ## select multi-columns
-    columns = st.multiselect(label='What columns do you want to display in line chart', options=df.columns)
+    columns = st.multiselect(label='Choose the columns you want to display from below drop down!', options=df.columns)
     st.line_chart(df[columns])
 
     # get correation of each feature in dataset
