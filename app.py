@@ -24,7 +24,7 @@ html_temp = """
 	"""
 st.markdown(html_temp,unsafe_allow_html=True)
 
-st.markdown("### Risers Team Members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
+##st.markdown("### Risers Team Members : Sridhar, Ram, Iqbal, Rex & Senthilnathan ")
 
 ##st.header('AIPM Dashboard')
 st.write(' Welcome to our AIPM Dashboard! here you can see how '
